@@ -151,6 +151,7 @@ MIT License — feel free to fork and modify (with credit).\
 
 Stay tuned! This is just the beginning. The project is actively being built and will evolve with more modules, visual polish, and AI enhancements.
 
+---
 
 # 📋Patch Notes
 
