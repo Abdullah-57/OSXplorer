@@ -1,6 +1,8 @@
 "use client"
 
+import { useParams } from "next/navigation"
 import { useState, useEffect } from "react"
+import { levelResultsData } from "../../../levelResultsData"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -22,32 +24,11 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
-// Mock data - in real app this would come from props/API
-const levelData = {
-  id: "fcfs-l1",
-  title: "FCFS Level 1: Pure FCFS Results",
-  module: "Scheduler Dash",
-  moduleId: "cpu-scheduling",
-  score: 92,
-  maxScore: 100,
-  xpEarned: 75,
-  performance: "Excellent Performance!",
-  stars: 3,
-  metrics: [
-    { label: "Average Waiting Time", value: "5.2s", icon: Clock, color: "text-cyan-400" },
-    { label: "Turnaround Time", value: "12.8s", icon: TrendingUp, color: "text-green-400" },
-    { label: "CPU Utilization", value: "85%", icon: Cpu, color: "text-blue-400" },
-    { label: "Context Switches", value: "8", icon: RotateCcw, color: "text-orange-400" },
-  ],
-  analysis: {
-    text: "Excellent work! You followed FCFS correctly, maintaining process order and minimizing idle time. Your CPU utilization of 85% shows efficient resource management.",
-    comparison: "Compare with Optimal",
-  },
-  unlocked: {
-    level: "FCFS Level 2: Arrival Overlap",
-    description: "New level unlocked in Scheduler Dash",
-  },
-  progressToNext: 66,
+const iconMap = {
+  Clock,
+  TrendingUp,
+  Cpu,
+  RotateCcw,
 }
 
 const userStats = {
@@ -82,12 +63,13 @@ const nextChallenge = {
 }
 
 function PerformanceMetric({ metric }: { metric: any }) {
+  const Icon = iconMap[metric.icon as keyof typeof iconMap] || Star
   return (
     <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50 hover:border-cyan-500/30 transition-all duration-300">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className={`p-2 rounded-lg bg-gray-700/50 ${metric.color}`}>
-            <metric.icon className="w-4 h-4" />
+            <Icon className="w-4 h-4" />
           </div>
           <span className="text-gray-300 text-sm">{metric.label}</span>
         </div>
@@ -117,12 +99,16 @@ function ScoreDisplay({ score, maxScore, stars, performance }: any) {
 }
 
 export default function LevelResults() {
+  const params = useParams()
+  const moduleId = params.moduleId as string
+  const levelId = params.levelId as string
+  const levelData = (levelResultsData as any)[moduleId]?.[levelId]
   const [isVisible, setIsVisible] = useState(false)
   const [animatedScore, setAnimatedScore] = useState(0)
-  const [notifications] = useState(3)
 
   useEffect(() => {
     setIsVisible(true)
+    if (!levelData) return
     // Animate score counting up
     const timer = setTimeout(() => {
       let current = 0
@@ -137,9 +123,14 @@ export default function LevelResults() {
         }
       }, 50)
     }, 500)
-
     return () => clearTimeout(timer)
-  }, [])
+  }, [levelData])
+
+  if (!levelData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white text-2xl">Level not found</div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -149,7 +140,6 @@ export default function LevelResults() {
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="floating-particles"></div>
       </div>
-
       {/* Main Content */}
       <main className="relative z-10 container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
@@ -164,7 +154,6 @@ export default function LevelResults() {
               </h1>
               <p className="text-xl text-gray-300">{levelData.module}</p>
             </div>
-
             {/* Performance Metrics */}
             <Card
               className={`bg-gray-900/50 border-gray-700/50 backdrop-blur-sm mb-8 transition-all duration-1000 delay-200 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
@@ -177,13 +166,12 @@ export default function LevelResults() {
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {levelData.metrics.map((metric, index) => (
+                  {levelData.metrics.map((metric: any, index: number) => (
                     <PerformanceMetric key={index} metric={metric} />
                   ))}
                 </div>
               </CardContent>
             </Card>
-
             {/* Solution Analysis */}
             <Card
               className={`bg-gray-900/50 border-gray-700/50 backdrop-blur-sm mb-8 transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
@@ -207,7 +195,6 @@ export default function LevelResults() {
                 <p className="text-gray-300 leading-relaxed">{levelData.analysis.text}</p>
               </CardContent>
             </Card>
-
             {/* Results Grid */}
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               {/* Final Score */}
@@ -229,7 +216,6 @@ export default function LevelResults() {
                   />
                 </CardContent>
               </Card>
-
               {/* Progression */}
               <Card
                 className={`bg-gray-900/50 border-gray-700/50 backdrop-blur-sm transition-all duration-1000 delay-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
@@ -265,7 +251,6 @@ export default function LevelResults() {
                 </CardContent>
               </Card>
             </div>
-
             {/* Action Buttons */}
             <div
               className={`flex flex-col sm:flex-row gap-4 justify-center transition-all duration-1000 delay-600 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
@@ -287,7 +272,6 @@ export default function LevelResults() {
               </Button>
             </div>
           </div>
-
           {/* Sidebar */}
           <div className="xl:col-span-1">
             <div className="sticky top-8 space-y-6">
@@ -323,7 +307,6 @@ export default function LevelResults() {
                   </div>
                 </CardContent>
               </Card>
-
               {/* Recent Achievements */}
               <Card
                 className={`bg-gray-900/50 border-gray-700/50 backdrop-blur-sm transition-all duration-1000 delay-800 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}`}
@@ -348,7 +331,6 @@ export default function LevelResults() {
                   ))}
                 </CardContent>
               </Card>
-
               {/* Next Challenge */}
               <Card
                 className={`bg-gradient-to-r from-orange-900 to-red-900 border-orange-500/50 backdrop-blur-sm transition-all duration-1000 delay-900 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}`}
@@ -379,4 +361,4 @@ export default function LevelResults() {
       </main>
     </div>
   )
-}
+} 

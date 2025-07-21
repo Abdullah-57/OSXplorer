@@ -7,7 +7,8 @@ function shouldShowNavbar(path: string) {
     path === "/" ||
     path.startsWith("/login") ||
     path.startsWith("/signup") ||
-    path.match(/^\/mini-quest\/[^/]+\/quiz/)
+    path.match(/^\/mini-quest\/[^/]+\/quiz(?!.*\/result)/) ||
+    (path.match(/^\/modules\/[^/]+\/mini-quest\/[^/]+\/quiz\//) && !path.match(/\/result\//))
   );
 }
 

@@ -17,104 +17,18 @@ import {
   Shield,
   Gamepad2,
 } from "lucide-react"
-
 import Link from "next/link"
-
-// Mock data - replace with actual API calls
-const getMiniQuestData = (moduleId: string) => {
-  const questData = {
-    "cpu-scheduling": {
-      title: "CPU Scheduling Mastery Quest",
-      description: "Test your understanding of CPU scheduling algorithms and process management concepts.",
-      concepts: [
-        "First-Come, First-Served (FCFS)",
-        "Shortest Job First (SJF)",
-        "Round Robin Scheduling",
-        "Priority Scheduling",
-        "Multilevel Queue Scheduling",
-      ],
-      difficulty: "Intermediate",
-      estimatedTime: 15,
-      totalQuestions: 12,
-      passingScore: 70,
-      rewards: {
-        xp: 250,
-        badges: ["CPU Scheduler", "Process Master"],
-        achievements: ["First Quest Complete"],
-      },
-      prerequisites: ["Basic OS Concepts", "Process States"],
-      tips: [
-        "Review the scheduling algorithms before starting",
-        "Pay attention to timing diagrams",
-        "Consider both efficiency and fairness",
-        "Think about real-world applications",
-      ],
-    },
-    "memory-management": {
-      title: "Memory Management Challenge",
-      description: "Master the concepts of memory allocation, paging, and virtual memory systems.",
-      concepts: [
-        "Memory Allocation Strategies",
-        "Paging and Segmentation",
-        "Virtual Memory",
-        "Page Replacement Algorithms",
-        "Memory Protection",
-      ],
-      difficulty: "Advanced",
-      estimatedTime: 20,
-      totalQuestions: 15,
-      passingScore: 75,
-      rewards: {
-        xp: 350,
-        badges: ["Memory Master", "Virtual Virtuoso"],
-        achievements: ["Advanced Concepts"],
-      },
-      prerequisites: ["CPU Scheduling", "Process Management"],
-      tips: [
-        "Understand the difference between physical and virtual memory",
-        "Practice calculating page table entries",
-        "Review replacement algorithms thoroughly",
-        "Consider memory fragmentation scenarios",
-      ],
-    },
-    "process-synchronization": {
-      title: "Synchronization Specialist Quest",
-      description: "Navigate the complex world of process synchronization and concurrent programming.",
-      concepts: [
-        "Critical Sections",
-        "Mutex and Semaphores",
-        "Deadlock Prevention",
-        "Producer-Consumer Problem",
-        "Dining Philosophers",
-      ],
-      difficulty: "Expert",
-      estimatedTime: 25,
-      totalQuestions: 18,
-      passingScore: 80,
-      rewards: {
-        xp: 450,
-        badges: ["Sync Master", "Deadlock Detective"],
-        achievements: ["Concurrency Expert"],
-      },
-      prerequisites: ["Memory Management", "Process Communication"],
-      tips: [
-        "Visualize the synchronization scenarios",
-        "Understand the conditions for deadlock",
-        "Practice with classic synchronization problems",
-        "Think about race conditions carefully",
-      ],
-    },
-  }
-
-  return questData[moduleId as keyof typeof questData] || questData["cpu-scheduling"]
-}
+import { miniQuestData } from "../../../miniQuestData"
 
 export default function MiniQuestOverview() {
   const router = useRouter()
   const params = useParams()
   const moduleId = params.moduleId as string
+  const miniQuestOverviewId = params.miniQuestOverviewId as string
 
-  const [questData, setQuestData] = useState(getMiniQuestData(moduleId))
+  // Load the data dynamically from the data file
+  const questData = (miniQuestData as any)[moduleId]?.[miniQuestOverviewId]
+
   const [isLoading, setIsLoading] = useState(false)
   const [userProgress, setUserProgress] = useState({
     completedPrerequisites: 85,
@@ -124,9 +38,8 @@ export default function MiniQuestOverview() {
 
   const handleStartQuest = () => {
     setIsLoading(true)
-    // Simulate loading time
     setTimeout(() => {
-      router.push(`/mini-quest/${moduleId}/quiz`)
+      router.push(`/modules/${moduleId}/mini-quest/${miniQuestOverviewId}/quiz/${miniQuestOverviewId}`)
     }, 1500)
   }
 
@@ -145,7 +58,13 @@ export default function MiniQuestOverview() {
     }
   }
 
-  const [notifications] = useState(3)
+  if (!questData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white text-2xl">
+        Mini-Quest not found
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -162,7 +81,9 @@ export default function MiniQuestOverview() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center space-x-2 mb-4">
               <Gamepad2 className="w-8 h-8 text-cyan-400" />
-              <Badge className={`${getDifficultyColor(questData.difficulty)} border`}>{questData.difficulty}</Badge>
+              <Badge className={`${getDifficultyColor(questData.difficulty)} border`}>
+                {questData.difficulty}
+              </Badge>
             </div>
             <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               {questData.title}
@@ -230,7 +151,7 @@ export default function MiniQuestOverview() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-2 gap-3">
-                    {questData.concepts.map((concept, index) => (
+                    {questData.concepts.map((concept: string, index: number) => (
                       <div
                         key={index}
                         className="flex items-center space-x-3 p-3 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-colors"
@@ -253,7 +174,7 @@ export default function MiniQuestOverview() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {questData.tips.map((tip, index) => (
+                    {questData.tips.map((tip: string, index: number) => (
                       <div
                         key={index}
                         className="flex items-start space-x-3 p-3 bg-green-500/5 border border-green-500/20 rounded-lg"
@@ -278,7 +199,7 @@ export default function MiniQuestOverview() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
-                    {questData.prerequisites.map((prereq, index) => (
+                    {questData.prerequisites.map((prereq: string, index: number) => (
                       <div key={index} className="flex items-center space-x-3">
                         <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                         <span className="text-sm text-gray-300">{prereq}</span>
@@ -328,7 +249,7 @@ export default function MiniQuestOverview() {
                     <h3 className="font-bold text-lg text-white mb-1">Ready to Begin?</h3>
                     <p className="text-sm text-gray-400">Complete this quest to unlock the next module</p>
                   </div>
-                  <Link href={`/mini-quest/${moduleId}/quiz`} passHref>
+                  <Link href={`/modules/${moduleId}/mini-quest/${miniQuestOverviewId}/quiz/${miniQuestOverviewId}`} passHref>
                     <Button
                       onClick={handleStartQuest}
                       disabled={isLoading || userProgress.completedPrerequisites < 80}
@@ -358,4 +279,4 @@ export default function MiniQuestOverview() {
       </main>
     </div>
   )
-}
+} 

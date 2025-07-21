@@ -565,7 +565,7 @@ export default function AchievementsPage() {
                     <Crown className="w-6 h-6 text-white" />
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-white mb-2">{userStats.rank}</div>
+                <div className="text-2xl md:text-xl font-bold text-white mb-2">{userStats.rank}</div>
                 <p className="text-gray-400">Current Rank</p>
               </CardContent>
             </Card>

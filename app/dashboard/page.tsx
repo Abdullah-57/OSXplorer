@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { OSGameLabLogo } from "@/components/ui/os-gamelab-logo"
 import {
   Cpu,
   HardDrive,
@@ -19,7 +20,7 @@ import Link from "next/link"
 
 // Mock user data
 const userData = {
-  name: "Alex Chen",
+  name: "Abdullah Daoud",
   username: "alexchen",
   avatar: "/placeholder.svg?height=40&width=40",
   level: 5,
@@ -126,14 +127,14 @@ export default function Dashboard() {
 
       {/* Main Content with Sidebar Layout */}
       <main className="relative z-10 container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 px-2 sm:px-0">
           {/* Main Content Area */}
           <div className="xl:col-span-3 space-y-8">
             {/* Welcome Banner */}
             <Card className="bg-gradient-to-r from-gray-900/80 to-black/80 border-cyan-500/30 backdrop-blur-sm welcome-banner">
               <CardContent className="p-8 bg-gradient-to-r from-cyan-999 to-black">
                 <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-                  Welcome back, {userData.name}! 🎮
+                  Welcome back, {userData.name}! <OSGameLabLogo className="inline-block align-middle ml-2" />
                 </h1>
                 <p className="text-lg text-gray-300">Ready to level up your Operating Systems knowledge?</p>
               </CardContent>

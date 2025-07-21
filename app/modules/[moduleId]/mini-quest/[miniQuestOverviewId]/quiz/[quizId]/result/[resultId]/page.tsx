@@ -18,108 +18,45 @@ import {
   BarChart3,
   PieChart,
 } from "lucide-react"
-
 import Link from "next/link"
+import { miniQuestQuizData } from "../../../../../../../miniQuestQuizData"
 
-// Mock data - replace with actual API calls
-const getQuizData = (moduleId: string) => {
-  const quizData = {
-    "cpu-scheduling": {
-      title: "CPU Scheduling Mastery Quest",
-      questions: [
-        {
-          id: 1,
-          question: "Which CPU scheduling algorithm is non-preemptive and processes jobs in the order they arrive?",
-          options: [
-            "Round Robin",
-            "First-Come, First-Served (FCFS)",
-            "Shortest Job First (SJF)",
-            "Priority Scheduling",
-          ],
-          correctAnswer: 1,
-          explanation:
-            "FCFS is a non-preemptive algorithm that processes jobs in the order they arrive in the ready queue.",
-          difficulty: "Easy",
-          concept: "Basic Scheduling",
-        },
-        {
-          id: 2,
-          question: "In Round Robin scheduling, what happens when a process's time quantum expires?",
-          options: [
-            "The process is terminated",
-            "The process is moved to the back of the ready queue",
-            "The process continues running",
-            "The process is given higher priority",
-          ],
-          correctAnswer: 1,
-          explanation:
-            "When a process's time quantum expires in Round Robin, it's preempted and moved to the back of the ready queue.",
-          difficulty: "Medium",
-          concept: "Round Robin",
-        },
-        {
-          id: 3,
-          question: "Which scheduling algorithm can lead to the 'convoy effect'?",
-          options: ["Shortest Job First", "Round Robin", "First-Come, First-Served", "Priority Scheduling"],
-          correctAnswer: 2,
-          explanation: "FCFS can lead to the convoy effect where short processes wait for long processes to complete.",
-          difficulty: "Medium",
-          concept: "Scheduling Issues",
-        },
-        {
-          id: 4,
-          question: "What is the main advantage of Shortest Job First (SJF) scheduling?",
-          options: [
-            "Fair to all processes",
-            "Minimizes average waiting time",
-            "Prevents starvation",
-            "Easy to implement",
-          ],
-          correctAnswer: 1,
-          explanation: "SJF minimizes the average waiting time for a given set of processes.",
-          difficulty: "Medium",
-          concept: "SJF Algorithm",
-        },
-        {
-          id: 5,
-          question: "In priority scheduling, what problem can occur with low-priority processes?",
-          options: ["Deadlock", "Race condition", "Starvation", "Thrashing"],
-          correctAnswer: 2,
-          explanation: "Low-priority processes may suffer from starvation if high-priority processes keep arriving.",
-          difficulty: "Hard",
-          concept: "Priority Issues",
-        },
-      ],
-    },
-  }
-
-  return quizData[moduleId as keyof typeof quizData] || quizData["cpu-scheduling"]
+// Helper to get quiz data dynamically
+const getQuizData = (moduleId: string, miniQuestOverviewId: string, quizId: string) => {
+  return (
+    (miniQuestQuizData as any)[moduleId]?.[quizId] ||
+    (miniQuestQuizData as any)[moduleId]?.[miniQuestOverviewId] ||
+    { title: "Quiz", questions: [] }
+  )
 }
 
-export default function MiniQuestResults() {
+export default function MiniQuestQuizResult() {
   const router = useRouter()
   const params = useParams()
   const moduleId = params.moduleId as string
+  const miniQuestOverviewId = params.miniQuestOverviewId as string
+  const quizId = params.quizId as string
+  const resultId = params.resultId as string
 
-  const [quizData] = useState(getQuizData(moduleId))
+  // Load quiz data
+  const quizData = getQuizData(moduleId, miniQuestOverviewId, quizId)
+
+  // Load results from sessionStorage (or could be from API/db in real app)
   const [results, setResults] = useState<any>(null)
   const [showReview, setShowReview] = useState(false)
   const [selectedQuestion, setSelectedQuestion] = useState(0)
-  const [notifications] = useState(3)
 
   useEffect(() => {
-    // Get results from sessionStorage
-    const storedResults = sessionStorage.getItem("quizResults")
+    // For demo: use resultId as key in sessionStorage
+    const storedResults = sessionStorage.getItem(`quizResults-${resultId}`) || sessionStorage.getItem("quizResults")
     if (storedResults) {
       const parsedResults = JSON.parse(storedResults)
-
       // Calculate score and analytics
       let correctAnswers = 0
-      const questionAnalytics = quizData.questions.map((question, index) => {
+      const questionAnalytics = quizData.questions.map((question: any, index: number) => {
         const userAnswer = parsedResults.answers[question.id]
         const isCorrect = userAnswer === question.correctAnswer
         if (isCorrect) correctAnswers++
-
         return {
           questionId: question.id,
           userAnswer,
@@ -130,10 +67,8 @@ export default function MiniQuestResults() {
           timeTaken: Math.floor(Math.random() * 60) + 30, // Mock time per question
         }
       })
-
       const score = Math.round((correctAnswers / quizData.questions.length) * 100)
       const passed = score >= 70
-
       setResults({
         ...parsedResults,
         score,
@@ -142,16 +77,16 @@ export default function MiniQuestResults() {
         passed,
         questionAnalytics,
         performance: {
-          easy: questionAnalytics.filter((q) => q.difficulty === "Easy"),
-          medium: questionAnalytics.filter((q) => q.difficulty === "Medium"),
-          hard: questionAnalytics.filter((q) => q.difficulty === "Hard"),
+          easy: questionAnalytics.filter((q: any) => q.difficulty === "Easy"),
+          medium: questionAnalytics.filter((q: any) => q.difficulty === "Medium"),
+          hard: questionAnalytics.filter((q: any) => q.difficulty === "Hard"),
         },
       })
     } else {
       // Redirect if no results found
-      router.push(`/mini-quest/${moduleId}/overview`)
+      router.push(`/modules/${moduleId}/mini-quest/${miniQuestOverviewId}/quiz/${quizId}`)
     }
-  }, [moduleId, quizData, router])
+  }, [moduleId, miniQuestOverviewId, quizId, resultId, quizData, router])
 
   if (!results) {
     return (
@@ -180,24 +115,22 @@ export default function MiniQuestResults() {
   const getPerformanceByDifficulty = (difficulty: string) => {
     const questions = results.performance[difficulty.toLowerCase()]
     if (!questions || questions.length === 0) return { correct: 0, total: 0, percentage: 0 }
-
     const correct = questions.filter((q: any) => q.isCorrect).length
     const total = questions.length
     const percentage = Math.round((correct / total) * 100)
-
     return { correct, total, percentage }
   }
 
   const handleRetakeQuiz = () => {
-    sessionStorage.removeItem("quizResults")
-    router.push(`/mini-quest/${moduleId}/quiz`)
+    sessionStorage.removeItem(`quizResults-${resultId}`)
+    router.push(`/modules/${moduleId}/mini-quest/${miniQuestOverviewId}/quiz/${quizId}`)
   }
 
   const handleContinue = () => {
     if (results.passed) {
       router.push("/dashboard")
     } else {
-      router.push(`/mini-quest/${moduleId}/overview`)
+      router.push(`/modules/${moduleId}/mini-quest/${miniQuestOverviewId}`)
     }
   }
 
@@ -209,7 +142,6 @@ export default function MiniQuestResults() {
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="floating-particles"></div>
       </div>
-
       <main className="relative z-10 container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {!showReview ? (
@@ -227,22 +159,18 @@ export default function MiniQuestResults() {
                     </div>
                   )}
                 </div>
-
                 <h1 className="text-5xl font-bold mb-4">
                   <span className={`${getScoreColor(results.score)} score-display`}>{results.score}%</span>
                 </h1>
-
                 <p className="text-xl text-gray-300 mb-2">
                   {results.correctAnswers} out of {results.totalQuestions} questions correct
                 </p>
-
                 <p className="text-gray-400">
                   {results.passed
                     ? "Congratulations! You have successfully completed this quest."
                     : "Keep studying and try again. You need 70% to pass."}
                 </p>
               </div>
-
               <div className="grid lg:grid-cols-3 gap-8">
                 {/* Performance Metrics */}
                 <div className="lg:col-span-2 space-y-6">
@@ -272,12 +200,11 @@ export default function MiniQuestResults() {
                         <div className="text-center">
                           <div className="text-3xl font-bold text-yellow-400 mb-2">{formatTime(results.timeSpent)}</div>
                           <div className="text-sm text-gray-400">Time Spent</div>
-                          <Progress value={(results.timeSpent / 900) * 100} className="mt-2 h-2" />
+                          <Progress value={(results.timeSpent / quizData.timeLimit) * 100} className="mt-2 h-2" />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-
                   {/* Difficulty Breakdown */}
                   <Card className="bg-gray-900/50 border-gray-700/50 backdrop-blur-sm performance-metric">
                     <CardHeader>
@@ -291,9 +218,7 @@ export default function MiniQuestResults() {
                         {["Easy", "Medium", "Hard"].map((difficulty) => {
                           const perf = getPerformanceByDifficulty(difficulty)
                           if (perf.total === 0) return null
-
                           const color = difficulty === "Easy" ? "green" : difficulty === "Medium" ? "yellow" : "red"
-
                           return (
                             <div key={difficulty} className="space-y-2">
                               <div className="flex items-center justify-between">
@@ -316,7 +241,6 @@ export default function MiniQuestResults() {
                       </div>
                     </CardContent>
                   </Card>
-
                   {/* Question Review */}
                   <Card className="bg-gray-900/50 border-gray-700/50 backdrop-blur-sm">
                     <CardHeader>
@@ -347,7 +271,7 @@ export default function MiniQuestResults() {
                             </div>
                             <div className="flex items-center space-x-2">
                               <Badge
-                                className={`${
+                                className={`$${
                                   qa.difficulty === "Easy"
                                     ? "bg-green-500/20 text-green-400 border-green-500/50"
                                     : qa.difficulty === "Medium"
@@ -362,7 +286,6 @@ export default function MiniQuestResults() {
                           </div>
                         ))}
                       </div>
-
                       <Button
                         onClick={() => setShowReview(true)}
                         variant="outline"
@@ -371,21 +294,20 @@ export default function MiniQuestResults() {
                         <BookOpen className="w-4 h-4 mr-2" />
                         Review Questions & Answers
                       </Button>
-                      <Link href="/modules/cpu-scheduling" className="w-full" passHref>
+                      <Link href={`/modules/${moduleId}/mini-quest/${miniQuestOverviewId}`} className="w-full" passHref>
                         <Button className="w-full mt-5 neon-button-primary">
                           <ArrowRight className="w-4 h-4 mr-2" />
-                          Back to Modules
+                          Back to Topic
                         </Button>
                       </Link>
                     </CardContent>
                   </Card>
                 </div>
-
                 {/* Sidebar */}
                 <div className="space-y-6">
                   {/* Rewards */}
                   {results.passed && (
-                    <Card className="bg-gradient-to-r from-green-500/10 to-cyan-500/10 border-green-500/30 backdrop-blur-sm">
+                    <Card className="bg-gradient-to-r from-cyan-700 to-purple-500 border-green-500/30 backdrop-blur-sm">
                       <CardHeader>
                         <CardTitle className="flex items-center space-x-2 text-green-400">
                           <Award className="w-5 h-5" />
@@ -395,22 +317,21 @@ export default function MiniQuestResults() {
                       <CardContent className="space-y-4">
                         <div className="text-center">
                           <div className="text-3xl font-bold text-yellow-400 mb-1">+250</div>
-                          <div className="text-sm text-gray-400">XP Points</div>
+                          <div className="text-sm text-white">XP Points</div>
                         </div>
                         <div className="space-y-2">
                           <div className="flex items-center space-x-2 text-sm">
                             <Star className="w-4 h-4 text-purple-400" />
-                            <span>CPU Scheduler Badge</span>
+                            <span className="text-white">Badge</span>
                           </div>
                           <div className="flex items-center space-x-2 text-sm">
                             <Trophy className="w-4 h-4 text-orange-400" />
-                            <span>First Quest Complete</span>
+                            <span className="text-white">Achievement</span>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
                   )}
-
                   {/* Next Steps */}
                   <Card className="bg-gray-900/50 border-gray-700/50 backdrop-blur-sm">
                     <CardHeader>
@@ -424,7 +345,7 @@ export default function MiniQuestResults() {
                               <CheckCircle className="w-4 h-4" />
                               <span className="font-semibold">Quest Completed!</span>
                             </div>
-                            <p className="text-sm text-gray-300">You can now proceed to the next module.</p>
+                            <p className="text-sm text-gray-300">You can now proceed to the next topic or module.</p>
                           </div>
                           <Button onClick={handleContinue} className="w-full neon-button-primary">
                             Continue Learning
@@ -439,18 +360,15 @@ export default function MiniQuestResults() {
                               <span className="font-semibold">Quest Failed</span>
                             </div>
                             <p className="text-sm text-gray-300">Review the material and try again.</p>
-                            </div>
-                          <Link href={`/mini-quest/${moduleId}/quiz`} className="w-full" passHref>
-                            <Button onClick={handleRetakeQuiz} className="w-full mt-5 neon-button-primary">
-                              <RotateCcw className="w-4 h-4 mr-2" />
-                              Retake Quest
-                            </Button>
-                          </Link>
+                          </div>
+                          <Button onClick={handleRetakeQuiz} className="w-full mt-5 neon-button-primary">
+                            <RotateCcw className="w-4 h-4 mr-2" />
+                            Retake Quest
+                          </Button>
                         </div>
                       )}
                     </CardContent>
                   </Card>
-
                   {/* Study Recommendations */}
                   <Card className="bg-gray-900/50 border-gray-700/50 backdrop-blur-sm">
                     <CardHeader>
@@ -488,7 +406,6 @@ export default function MiniQuestResults() {
                   Question {selectedQuestion + 1} of {quizData.questions.length}
                 </div>
               </div>
-
               <div className="grid lg:grid-cols-4 gap-6">
                 {/* Question Navigation */}
                 <div className="lg:col-span-1">
@@ -498,7 +415,7 @@ export default function MiniQuestResults() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        {quizData.questions.map((_, index) => {
+                        {quizData.questions.map((_: any, index: number) => {
                           const qa = results.questionAnalytics[index]
                           return (
                             <button
@@ -526,7 +443,6 @@ export default function MiniQuestResults() {
                     </CardContent>
                   </Card>
                 </div>
-
                 {/* Question Review */}
                 <div className="lg:col-span-3">
                   <Card className="bg-gray-900/50 border-gray-700/50 backdrop-blur-sm">
@@ -534,7 +450,7 @@ export default function MiniQuestResults() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <Badge
-                            className={`${
+                            className={`$${
                               quizData.questions[selectedQuestion].difficulty === "Easy"
                                 ? "bg-green-500/20 text-green-400 border-green-500/50"
                                 : quizData.questions[selectedQuestion].difficulty === "Medium"
@@ -571,15 +487,12 @@ export default function MiniQuestResults() {
                           {quizData.questions[selectedQuestion].question}
                         </h3>
                       </div>
-
                       {/* Answer Options */}
                       <div className="space-y-3">
-                        {quizData.questions[selectedQuestion].options.map((option, index) => {
+                        {quizData.questions[selectedQuestion].options.map((option: string, index: number) => {
                           const isUserAnswer = results.questionAnalytics[selectedQuestion].userAnswer === index
                           const isCorrectAnswer = quizData.questions[selectedQuestion].correctAnswer === index
-
                           let className = "w-full p-4 text-left rounded-lg border-2 "
-
                           if (isCorrectAnswer) {
                             className += "border-green-500 bg-green-500/10 text-green-400"
                           } else if (isUserAnswer && !isCorrectAnswer) {
@@ -587,7 +500,6 @@ export default function MiniQuestResults() {
                           } else {
                             className += "border-gray-600 bg-gray-800/30 text-gray-300"
                           }
-
                           return (
                             <div key={index} className={className}>
                               <div className="flex items-center space-x-3">
@@ -607,7 +519,7 @@ export default function MiniQuestResults() {
                                   {String.fromCharCode(65 + index)}. {option}
                                 </span>
                                 {isUserAnswer && (
-                                  <Badge variant="outline" className="ml-auto text-xs">
+                                  <Badge variant="outline" className="ml-auto text-xs text-white">
                                     Your Answer
                                   </Badge>
                                 )}
@@ -621,7 +533,6 @@ export default function MiniQuestResults() {
                           )
                         })}
                       </div>
-
                       {/* Explanation */}
                       <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                         <h4 className="font-semibold text-blue-400 mb-2 flex items-center space-x-2">
@@ -632,7 +543,6 @@ export default function MiniQuestResults() {
                           {quizData.questions[selectedQuestion].explanation}
                         </p>
                       </div>
-
                       {/* Navigation */}
                       <div className="flex items-center justify-between pt-4 border-t border-gray-700/50">
                         <Button
@@ -666,4 +576,4 @@ export default function MiniQuestResults() {
       </main>
     </div>
   )
-}
+} 

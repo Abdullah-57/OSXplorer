@@ -122,14 +122,16 @@ Read more in the Next.js deployment documentation.
 
 ```bash
 /osxplorer
-├── public/                # Assets, icons
 ├── app/                   # Next.js app directory
 │   ├── page.tsx           # Homepage
 │   └── ...                # Route-based pages
 ├── components/            # Reusable UI components
 ├── games/                 # Kaboom.js / Konva.js logic
+├── public/                # Assets, icons
 ├── styles/                # Tailwind & global styles
-└── README.md
+├── PATCH_NOTES.md         # Patch notes for all releases and commits
+└── README.md              # Project documentation
+
 ```
 
 ---

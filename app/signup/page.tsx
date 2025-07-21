@@ -84,7 +84,7 @@ export default function SignupPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
+    <div className="min-h-screen bg-black text-white">
       {/* Animated Background */}
       <div className="fixed inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
@@ -93,7 +93,7 @@ export default function SignupPage() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 border-b border-cyan-500/30 bg-black/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-20 border-b border-cyan-500/30 bg-black/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <nav className="flex items-center justify-between">
             <Link href="/" className="flex items-center">
@@ -239,7 +239,7 @@ export default function SignupPage() {
 
               {/* Signup Button */}
               <Link href="/dashboard" className="block" passHref legacyBehavior>
-                <Button type="submit" className="w-full neon-button-primary group text-lg py-6" size="lg" as="a">
+                <Button type="submit" className="w-full neon-button-primary group text-lg py-6" size="lg">
                   <Gamepad2 className="w-5 h-5 mr-2 group-hover:animate-pulse" />
                   Create Account
                 </Button>

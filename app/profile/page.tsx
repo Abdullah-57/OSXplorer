@@ -59,9 +59,9 @@ export default function ProfileSettings() {
 
   // User data state
   const [userData, setUserData] = useState({
-    displayName: "Alex Chen",
-    username: "alexchen_dev",
-    email: "alex.chen@example.com",
+    displayName: "Abdullah Daoud",
+    username: "abdullahdaoud_dev",
+    email: "abdullah.daoud@example.com",
     bio: "Passionate about operating systems and low-level programming. Currently mastering CPU scheduling algorithms and memory management.",
     profilePicture: "/placeholder.svg?height=120&width=120",
     verified: true,
@@ -176,19 +176,31 @@ export default function ProfileSettings() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
             {/* Tab Navigation */}
             <TabsList className="grid w-full grid-cols-4 bg-gray-900/50 border border-gray-700/50">
-              <TabsTrigger value="profile" className="flex items-center space-x-2 data-[state=active]:border-cyan-500/50 data-[state=active]:text-cyan-400 data-[state=active]:bg-transparent data-[state=active]:hover:bg-cyan-500/10 border-b-2 border-transparent text-gray-400">
+              <TabsTrigger
+                value="profile"
+                className="flex items-center space-x-2 data-[state=active]:border-cyan-500/50 data-[state=active]:text-cyan-400 data-[state=active]:bg-cyan-500/10 data-[state=active]:hover:bg-cyan-500/10 hover:bg-cyan-500/20 border-b-2 border-transparent text-gray-400"
+              >
                 <User className="w-4 h-4" />
                 <span>Profile</span>
               </TabsTrigger>
-              <TabsTrigger value="notifications" className="flex items-center space-x-2 data-[state=active]:border-cyan-500/50 data-[state=active]:text-cyan-400 data-[state=active]:bg-transparent data-[state=active]:hover:bg-cyan-500/10 border-b-2 border-transparent text-gray-400">
-                <Bell className="w-4 h-4" />
+              <TabsTrigger
+                value="notifications"
+                className="flex items-center space-x-2 data-[state=active]:border-cyan-500/50 data-[state=active]:text-cyan-400 data-[state=active]:bg-cyan-500/10 data-[state=active]:hover:bg-cyan-500/10 hover:bg-cyan-500/20 border-b-2 border-transparent text-gray-400"
+              >
+                <span className="flex items-center justify-center w-4 h-4"><Bell className="w-4 h-4" /></span>
                 <span>Notifications</span>
               </TabsTrigger>
-              <TabsTrigger value="privacy" className="flex items-center space-x-2 data-[state=active]:border-cyan-500/50 data-[state=active]:text-cyan-400 data-[state=active]:bg-transparent data-[state=active]:hover:bg-cyan-500/10 border-b-2 border-transparent text-gray-400">
+              <TabsTrigger
+                value="privacy"
+                className="flex items-center space-x-2 data-[state=active]:border-cyan-500/50 data-[state=active]:text-cyan-400 data-[state=active]:bg-cyan-500/10 data-[state=active]:hover:bg-cyan-500/10 hover:bg-cyan-500/20 border-b-2 border-transparent text-gray-400"
+              >
                 <Shield className="w-4 h-4" />
                 <span>Privacy</span>
               </TabsTrigger>
-              <TabsTrigger value="security" className="flex items-center space-x-2 data-[state=active]:border-cyan-500/50 data-[state=active]:text-cyan-400 data-[state=active]:bg-transparent data-[state=active]:hover:bg-cyan-500/10 border-b-2 border-transparent text-gray-400">
+              <TabsTrigger
+                value="security"
+                className="flex items-center space-x-2 data-[state=active]:border-cyan-500/50 data-[state=active]:text-cyan-400 data-[state=active]:bg-cyan-500/10 data-[state=active]:hover:bg-cyan-500/10 hover:bg-cyan-500/20 border-b-2 border-transparent text-gray-400"
+              >
                 <Lock className="w-4 h-4" />
                 <span>Security</span>
               </TabsTrigger>
@@ -955,7 +967,7 @@ export default function ProfileSettings() {
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                 >
-                  {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showCurrentPassword ? <EyeOff className="h-4 w-4 text-white" /> : <Eye className="h-4 w-4 text-white" />}
                 </Button>
               </div>
             </div>
@@ -974,7 +986,7 @@ export default function ProfileSettings() {
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowNewPassword(!showNewPassword)}
                 >
-                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showNewPassword ? <EyeOff className="h-4 w-4 text-white" /> : <Eye className="h-4 w-4 text-white" />}
                 </Button>
               </div>
             </div>
@@ -993,17 +1005,17 @@ export default function ProfileSettings() {
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4 text-white" /> : <Eye className="h-4 w-4 text-white" />}
                 </Button>
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPasswordDialog(false)}>
-              Cancel
-            </Button>
+          <DialogFooter className="flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Button onClick={handlePasswordChange} className="neon-button-primary">
               Change Password
+            </Button>
+            <Button variant="outline" onClick={() => setShowPasswordDialog(false)}>
+              Cancel
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1035,12 +1047,12 @@ export default function ProfileSettings() {
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShow2FADialog(false)}>
-              Cancel
-            </Button>
+          <DialogFooter className="flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Button onClick={handleEnable2FA} className="neon-button-primary">
               Enable 2FA
+            </Button>
+            <Button variant="outline" onClick={() => setShow2FADialog(false)}>
+              Cancel
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1068,7 +1080,7 @@ export default function ProfileSettings() {
               </ul>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmDelete">Type "DELETE" to confirm</Label>
+              <Label htmlFor="confirmDelete" className="text-white">Type "DELETE" to confirm</Label>
               <Input id="confirmDelete" placeholder="DELETE" className="bg-gray-800/50 border-gray-600 text-white" />
             </div>
           </div>

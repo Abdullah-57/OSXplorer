@@ -56,7 +56,7 @@ export default function RetroFuturisticLMS() {
   ]
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
+    <div className="min-h-screen bg-black text-white">
       {/* Animated Background */}
       <div className="fixed inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
@@ -65,7 +65,7 @@ export default function RetroFuturisticLMS() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 border-b border-cyan-500/30 bg-black/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-20 border-b border-cyan-500/30 bg-black/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <nav className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -267,7 +267,7 @@ export default function RetroFuturisticLMS() {
               </CardHeader>
               <CardContent className="text-center">
                 <p className="text-gray-400 mb-4">
-                  Master of pixels and animations. Alex crafts the stunning retro-futuristic UI that makes learning feel
+                  Master of pixels and animations. Abdullah crafts the stunning retro-futuristic UI that makes learning feel
                   like gaming.
                 </p>
                 <div className="flex justify-center space-x-2">
@@ -298,7 +298,7 @@ export default function RetroFuturisticLMS() {
               </CardHeader>
               <CardContent className="text-center">
                 <p className="text-gray-400 mb-4">
-                  The architect behind the scenes. Sarah builds robust systems that power our interactive learning
+                  The architect behind the scenes. Usman builds robust systems that power our interactive learning
                   experiences.
                 </p>
                 <div className="flex justify-center space-x-2">

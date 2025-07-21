@@ -20,6 +20,8 @@ import {
   User,
   Users,
   LogOut,
+  Home,
+  Crown
 } from "lucide-react"
 import React, { useState } from "react"
 
@@ -60,7 +62,7 @@ export function Navbar() {
     },
   ]
   return (
-    <header className="relative z-10 border-b border-cyan-500/30 bg-black/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-20 border-b border-cyan-500/30 bg-black/80 backdrop-blur-sm">
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center justify-between">
           {/* Logo */}
@@ -129,11 +131,20 @@ export function Navbar() {
                 <DropdownMenuItem asChild>
                   <Link href="/profile" passHref legacyBehavior>
                     <a className="flex items-center px-2 py-2 rounded-md transition-colors hover:bg-gray-800 hover:text-white">
-                      <User className="mr-2 h-4 w-4 text-cyan-400" />
+                      <User className="mr-2 h-4 w-4 text-gray-400" />
                       <span className="text-white">Profile</span>
                     </a>
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                <Link href="/dashboard" passHref legacyBehavior>
+                    <a className="flex items-center px-2 py-2 rounded-md transition-colors hover:bg-gray-800 hover:text-white">
+                      <Home className="mr-2 h-4 w-4 text-cyan-400" />
+                      <span className="text-white">Dashboard</span>
+                    </a>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild></DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/achievements" passHref legacyBehavior>
                     <a className="flex items-center px-2 py-2 rounded-md transition-colors hover:bg-gray-800 hover:text-white">
@@ -145,7 +156,7 @@ export function Navbar() {
                 <DropdownMenuItem asChild>
                   <Link href="/leaderboard" passHref legacyBehavior>
                     <a className="flex items-center px-2 py-2 rounded-md transition-colors hover:bg-gray-800 hover:text-white">
-                      <Users className="mr-2 h-4 w-4 text-green-400" />
+                      <Crown className="mr-2 h-4 w-4 text-green-400" />
                       <span className="text-white">Leaderboard</span>
                     </a>
                   </Link>

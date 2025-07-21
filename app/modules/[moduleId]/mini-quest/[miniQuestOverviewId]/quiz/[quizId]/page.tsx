@@ -9,89 +9,28 @@ import { Progress } from "@/components/ui/progress"
 import { ChevronLeft, ChevronRight, Flag, AlertTriangle, CheckCircle, Target, Timer } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { miniQuestQuizData } from "../../../../../miniQuestQuizData"
 
-// Mock quiz data - replace with actual API calls
-const getQuizData = (moduleId: string) => {
-  const quizData = {
-    "cpu-scheduling": {
-      title: "CPU Scheduling Mastery Quest",
-      timeLimit: 900, // 15 minutes in seconds
-      questions: [
-        {
-          id: 1,
-          question: "Which CPU scheduling algorithm is non-preemptive and processes jobs in the order they arrive?",
-          options: [
-            "Round Robin",
-            "First-Come, First-Served (FCFS)",
-            "Shortest Job First (SJF)",
-            "Priority Scheduling",
-          ],
-          correctAnswer: 1,
-          explanation:
-            "FCFS is a non-preemptive algorithm that processes jobs in the order they arrive in the ready queue.",
-          difficulty: "Easy",
-          concept: "Basic Scheduling",
-        },
-        {
-          id: 2,
-          question: "In Round Robin scheduling, what happens when a process's time quantum expires?",
-          options: [
-            "The process is terminated",
-            "The process is moved to the back of the ready queue",
-            "The process continues running",
-            "The process is given higher priority",
-          ],
-          correctAnswer: 1,
-          explanation:
-            "When a process's time quantum expires in Round Robin, it's preempted and moved to the back of the ready queue.",
-          difficulty: "Medium",
-          concept: "Round Robin",
-        },
-        {
-          id: 3,
-          question: "Which scheduling algorithm can lead to the 'convoy effect'?",
-          options: ["Shortest Job First", "Round Robin", "First-Come, First-Served", "Priority Scheduling"],
-          correctAnswer: 2,
-          explanation: "FCFS can lead to the convoy effect where short processes wait for long processes to complete.",
-          difficulty: "Medium",
-          concept: "Scheduling Issues",
-        },
-        {
-          id: 4,
-          question: "What is the main advantage of Shortest Job First (SJF) scheduling?",
-          options: [
-            "Fair to all processes",
-            "Minimizes average waiting time",
-            "Prevents starvation",
-            "Easy to implement",
-          ],
-          correctAnswer: 1,
-          explanation: "SJF minimizes the average waiting time for a given set of processes.",
-          difficulty: "Medium",
-          concept: "SJF Algorithm",
-        },
-        {
-          id: 5,
-          question: "In priority scheduling, what problem can occur with low-priority processes?",
-          options: ["Deadlock", "Race condition", "Starvation", "Thrashing"],
-          correctAnswer: 2,
-          explanation: "Low-priority processes may suffer from starvation if high-priority processes keep arriving.",
-          difficulty: "Hard",
-          concept: "Priority Issues",
-        },
-      ],
-    },
-  }
-
-  return quizData[moduleId as keyof typeof quizData] || quizData["cpu-scheduling"]
+// Helper to get quiz data dynamically based on all three params
+const getQuizData = (moduleId: string, miniQuestOverviewId: string, quizId: string) => {
+  // Try quizId first, then miniQuestOverviewId as fallback, then empty quiz
+  return (
+    (miniQuestQuizData as any)[moduleId]?.[quizId] ||
+    (miniQuestQuizData as any)[moduleId]?.[miniQuestOverviewId] ||
+    { title: "Quiz", timeLimit: 900, questions: [] }
+  )
 }
 
 export default function MiniQuestQuiz() {
   const router = useRouter()
   const params = useParams()
   const moduleId = params.moduleId as string
+  const miniQuestOverviewId = params.miniQuestOverviewId as string
+  const quizId = params.quizId as string
 
-  const [quizData] = useState(getQuizData(moduleId))
+  // Load quiz data from the new data file using all three params
+  const quizData = getQuizData(moduleId, miniQuestOverviewId, quizId)
+
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({})
   const [timeRemaining, setTimeRemaining] = useState(quizData.timeLimit)
@@ -162,22 +101,22 @@ export default function MiniQuestQuiz() {
       timeSpent: quizData.timeLimit - timeRemaining,
       flaggedQuestions: Array.from(flaggedQuestions),
     }
-
+    // Generate a unique resultId for this attempt
+    const resultId = Date.now().toString()
     // Store results in sessionStorage for the results page
-    sessionStorage.setItem("quizResults", JSON.stringify(results))
-
-    // Navigate to results page
+    sessionStorage.setItem(`quizResults-${resultId}`, JSON.stringify(results))
+    // Navigate to new dynamic result page
     setTimeout(() => {
-      router.push(`/mini-quest/${moduleId}/results`)
+      router.push(`/modules/${moduleId}/mini-quest/${miniQuestOverviewId}/quiz/${quizId}/result/${resultId}`)
     }, 1000)
-  }, [selectedAnswers, timeRemaining, flaggedQuestions, moduleId, router, quizData.timeLimit])
+  }, [selectedAnswers, timeRemaining, flaggedQuestions, moduleId, miniQuestOverviewId, quizId, router, quizData.timeLimit])
 
   const getAnsweredCount = () => {
     return Object.keys(selectedAnswers).length
   }
 
   const getProgressPercentage = () => {
-    return (getAnsweredCount() / quizData.questions.length) * 100
+    return quizData.questions.length > 0 ? (getAnsweredCount() / quizData.questions.length) * 100 : 0
   }
 
   const currentQ = quizData.questions[currentQuestion]
@@ -191,53 +130,47 @@ export default function MiniQuestQuiz() {
         <div className="floating-particles"></div>
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 border-b border-cyan-500/30 bg-black backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              {/* Logo */}
-              <Link href="/">
-                <Image
-                  src="/OSXplorer.png"
-                  alt="OSXplorer Logo"
-                  width={120}
-                  height={60}
-                  priority
-                  className="object-contain h-auto w-auto hover:scale-110 transition-transform duration-200 cursor-pointer hover:drop-shadow-[0_0_16px_#00fff7]"
-                />
-              </Link>
-              {/* Quest Name */}
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-                  {quizData.title}
-                </h1>
-                <p className="text-gray-400 text-sm">
-                  Question {currentQuestion + 1} of {quizData.questions.length}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-6">
-              {/* Progress */}
-              <div className="flex items-center space-x-2">
-                <Target className="w-4 h-4 text-cyan-400" />
-                <span className="text-sm text-gray-400">
-                  {getAnsweredCount()}/{quizData.questions.length} answered
-                </span>
-              </div>
-
-              {/* Timer */}
-              <div className={`flex items-center space-x-2 ${getTimeColor()}`}>
-                <Timer className="w-4 h-4" />
-                <span className="font-mono text-lg font-bold">{formatTime(timeRemaining)}</span>
-              </div>
+      {/* Lower Header: Progress Bar and Timer Only */}
+      <header className="sticky top-0 z-20 border-b border-cyan-500/30 bg-black backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex-1 flex items-center gap-3">
+            {/* Logo next to title with navbar styling */}
+            <Image
+              src="/OSXplorer.png"
+              alt="OSXplorer Logo"
+              width={40}
+              height={40}
+              priority
+              className="object-contain h-auto w-auto hover:scale-110 transition-transform duration-200 cursor-pointer hover:drop-shadow-[0_0_16px_#00fff7]"
+              style={{ minWidth: 40, minHeight: 40 }}
+            />
+            <div className="flex flex-col justify-center">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent flex items-center">
+                {quizData.title}
+              </h1>
+              <p className="text-gray-400 text-sm">
+                Question {currentQuestion + 1} of {quizData.questions.length}
+              </p>
             </div>
           </div>
-
-          {/* Progress Bar */}
-          <div className="mt-4">
-            <Progress value={getProgressPercentage()} className="h-2" />
+          <div className="flex items-center space-x-6">
+            {/* Progress */}
+            <div className="flex items-center space-x-2">
+              <Target className="w-4 h-4 text-cyan-400" />
+              <span className="text-sm text-gray-400">
+                {getAnsweredCount()}/{quizData.questions.length} answered
+              </span>
+            </div>
+            {/* Timer */}
+            <div className={`flex items-center space-x-2 ${getTimeColor()}`}>
+              <Timer className="w-4 h-4" />
+              <span className="font-mono text-lg font-bold">{formatTime(timeRemaining)}</span>
+            </div>
           </div>
+        </div>
+        <div className="container mx-auto px-4">
+          <Progress value={getProgressPercentage()} className="h-2" />
+          <div className="mb-4" /> {/* Add margin below progress bar */}
         </div>
       </header>
 
@@ -252,7 +185,7 @@ export default function MiniQuestQuiz() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex gap-2 overflow-x-auto pb-2">
-                    {quizData.questions.map((_, index) => {
+                    {quizData.questions.map((_: any, index: number) => {
                       const isAnswered = selectedAnswers[index + 1] !== undefined
                       const isFlagged = flaggedQuestions.has(index + 1)
                       const isCurrent = index === currentQuestion
@@ -304,36 +237,38 @@ export default function MiniQuestQuiz() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/50">
-                        {currentQ.difficulty}
+                        {currentQ?.difficulty || ""}
                       </Badge>
                       <Badge variant="outline" className="border-cyan-500/50 text-cyan-400">
-                        {currentQ.concept}
+                        {currentQ?.concept || ""}
                       </Badge>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleFlagQuestion(currentQ.id)}
-                      className={`${
-                        flaggedQuestions.has(currentQ.id)
-                          ? "text-yellow-400 bg-yellow-500/10"
-                          : "text-gray-400 hover:text-yellow-400"
-                      }`}
-                    >
-                      <Flag className="w-4 h-4 mr-2" />
-                      {flaggedQuestions.has(currentQ.id) ? "Flagged" : "Flag"}
-                    </Button>
+                    {currentQ && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleFlagQuestion(currentQ.id)}
+                        className={`$${
+                          flaggedQuestions.has(currentQ.id)
+                            ? "text-yellow-400 bg-yellow-500/10"
+                            : "text-gray-400 hover:text-yellow-400"
+                        }`}
+                      >
+                        <Flag className="w-4 h-4 mr-2" />
+                        {flaggedQuestions.has(currentQ.id) ? "Flagged" : "Flag"}
+                      </Button>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Question */}
                   <div className="p-6 bg-gray-800/30 rounded-lg">
-                    <h2 className="text-xl font-semibold text-white leading-relaxed">{currentQ.question}</h2>
+                    <h2 className="text-xl font-semibold text-white leading-relaxed">{currentQ?.question || "No question available."}</h2>
                   </div>
 
                   {/* Answer Options */}
                   <div className="space-y-3">
-                    {currentQ.options.map((option, index) => {
+                    {currentQ?.options?.map((option: string, index: number) => {
                       const isSelected = selectedAnswers[currentQ.id] === index
 
                       return (
@@ -416,8 +351,8 @@ export default function MiniQuestQuiz() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-gray-300">
-                Are you sure you want to submit your quiz? You have answered{" "}
-                <span className="font-bold text-cyan-400">{getAnsweredCount()}</span> out of{" "}
+                Are you sure you want to submit your quiz? You have answered {" "}
+                <span className="font-bold text-cyan-400">{getAnsweredCount()}</span> out of {" "}
                 <span className="font-bold">{quizData.questions.length}</span> questions.
               </p>
 
@@ -455,4 +390,4 @@ export default function MiniQuestQuiz() {
       )}
     </div>
   )
-}
+} 

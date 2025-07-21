@@ -420,9 +420,9 @@ function LeaderboardRow({ player, index }: { player: Player; index: number }) {
           <div className="font-bold text-green-400">{player.levelsCompleted}</div>
           <div className="text-gray-400 text-xs">Levels</div>
         </div>
-        <div className="flex items-center space-x-1 min-w-[60px]">
-          <Flame className="w-4 h-4 text-orange-500" />
-          <span className="text-orange-400 font-bold">{player.currentStreak}</span>
+        <div className="relative flex items-center min-w-[60px]" style={{width: 'auto'}}>
+          <Flame className="w-4 h-4 text-orange-500 leading-none align-middle p-0 m-0" />
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400 font-bold leading-none align-middle p-0 m-0" style={{marginLeft: 0}}>{player.currentStreak}</span>
         </div>
       </div>
     </div>
@@ -791,7 +791,7 @@ export default function LeaderboardPage() {
               <CardContent>
                 <div className="space-y-3">
                   {topThree.slice(0, 3).map((player, index) => (
-                    <div key={player.id} className="flex items-center justify-between">
+                    <div key={player.id} className="flex items-center justify-between gap-2 md:gap-4">
                       <div className="flex items-center space-x-2">
                         <Badge className="bg-cyan-500/20 border-cyan-500/50 text-cyan-300 text-xs">#{index + 1}</Badge>
                         <span className="text-sm text-white truncate">{player.displayName}</span>
@@ -823,7 +823,7 @@ export default function LeaderboardPage() {
               <CardContent>
                 <div className="space-y-3">
                   {topThree.slice(0, 3).map((player, index) => (
-                    <div key={player.id} className="flex items-center justify-between">
+                    <div key={player.id} className="flex items-center justify-between gap-2 md:gap-4">
                       <div className="flex items-center space-x-2">
                         <Badge className="bg-purple-500/20 border-purple-500/50 text-purple-300 text-xs">
                           #{index + 1}
@@ -857,7 +857,7 @@ export default function LeaderboardPage() {
               <CardContent>
                 <div className="space-y-3">
                   {topThree.slice(0, 3).map((player, index) => (
-                    <div key={player.id} className="flex items-center justify-between">
+                    <div key={player.id} className="flex items-center justify-between gap-2 md:gap-4">
                       <div className="flex items-center space-x-2">
                         <Badge className="bg-red-500/20 border-red-500/50 text-red-300 text-xs">#{index + 1}</Badge>
                         <span className="text-sm text-white truncate">{player.displayName}</span>
