@@ -33,7 +33,7 @@ The platform is designed with:
 | Layer | Technology |
 | --- | --- |
 | **Frontend** | Next.js, Tailwind CSS |
-| **Game Engine** | Kaboom.js + Konva.js |
+| **Game Engine** | Phaser.js + Konva.js |
 | **Backend** | Node.js + Express.js |
 | **Database** | MongoDB |
 | **Auth** | Firebase/Auth0 (planned) |
